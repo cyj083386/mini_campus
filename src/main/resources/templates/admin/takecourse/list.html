@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/admin_layout}">
+	
+	<head>
+		<script>
+			$(document).ready(function () {
+				
+				$('.status-buttons button').on('click', function () {
+					
+					let status = $(this).val();
+					let id = $(this).closest('.status-buttons').find('input[name=id]').val();
+					
+					let msg = status == 'COMPLETE' ? '결제완료 처리 하시겠습니까?' : '수강취소 처리 하시겠습니까?';
+					if (!confirm(msg)) {
+						return false;
+					}
+					
+					let $form = $('#statusUpdateForm');
+					
+					$form.find('input[name=id]').val(id);
+					$form.find('input[name=status]').val(status);
+					
+					$form.submit();
+					
+				});
+			});
+		</script>
+	</head>
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>수강 관리</h1>
+		</div>
+		
+		<div class="container-fluid">
+			<div style="float: right; margin-bottom: 5px">
+				<button type="button" class="btn btn-primary"
+				        th:onclick="|location.href='@{/admin/takecourse/list.do}'|">전체
+				</button>
+				<button type="button" class="btn btn-warning"
+				        th:onclick="|location.href='@{/admin/takecourse/list.do?searchType=REQUEST}'|">신청중
+				</button>
+				<button type="button" class="btn btn-success"
+				        th:onclick="|location.href='@{/admin/takecourse/list.do?searchType=COMPLETE}'|">결제완료
+				</button>
+				<button type="button" class="btn btn-danger"
+				        th:onclick="|location.href='@{/admin/takecourse/list.do?searchType=CANCEL}'|">취소
+				</button>
+			</div>
+		</div>
+		
+		
+		<div class="container-fluid">
+			<table class="table table-hover member-list">
+				<thead>
+					<tr class="table-success">
+						<th scope="col">강의명</th>
+						<th scope="col">회원 ID</th>
+						<th scope="col">회원 연락처</th>
+						<th scope="col">신청일</th>
+						<th scope="col">신청 상태</th>
+						<th scope="col">비고</th>
+					</tr>
+				</thead>
+				<tbody id="dataList">
+					<tr th:each="takeCourse : ${list}">
+						<td th:text="${takeCourse.subject}">강의명</td>
+						<td>
+							<a th:text="${takeCourse.memberId}">회원 ID</a>
+						</td>
+						<td th:text="${takeCourse.memberPhone}">회원 연락처</td>
+						<td th:text="${takeCourse.registeredAt}">신청일</td>
+						<td th:text="${takeCourse.status}">신청 상태</td>
+						<td>
+							<div class="status-buttons" th:if="${#strings.equals(takeCourse.status,'REQUEST')}">
+								<input type="hidden" name="id" th:value="${takeCourse.id}"/>
+								<button type="button" value="COMPLETE" class="btn btn-outline-success completeBtn">결제완료 하기</button>
+								<button type="button" value="CANCEL" class="btn btn-outline-danger cancelBtn">수강취소 하기</button>
+							</div>
+						</td>
+					
+					</tr>
+				</tbody>
+			</table>
+			
+			<form method="post" action="/admin/takecourse/status.do" id="statusUpdateForm">
+				<input type="hidden" name="id">
+				<input type="hidden" name="status">
+			</form>
+		</div>
+		
+		
+		<div class="container-fluid">
+			<ul class="pagination" style="width: 100%; justify-content: center">
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/admin/takecourse/list.do(page=0 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&laquo;</a>
+				</li>
+				<li class="page-item" th:classappend="${page.first} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.first} ? '#' : @{/admin/takecourse/list.do(page=${page.curNum}-1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&lt;</a>
+				</li>
+				
+				<li class="page-item" th:each="index : ${#numbers.sequence(page.start,page.end)}"
+				    th:classappend="${index == (page.curNum + 1)} ? 'active'">
+					<a class="page-link" th:text="${index}"
+					   th:href="@{/admin/takecourse/list.do(page=${index}-1
+						,searchType=${searchInput.searchType}
+						,searchValue=${searchInput.searchValue})}">index</a>
+				</li>
+				
+				<li class="page-item" th:classappend="${page.last} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.last} ? '#' : @{/admin/takecourse/list.do(page=${page.curNum}+1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&gt;</a>
+				</li>
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/admin/takecourse/list.do(page=${page.totalPages}-1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&raquo;</a>
+				</li>
+			
+			</ul>
+		</div>
+	</th:block>
+
+
+</html>

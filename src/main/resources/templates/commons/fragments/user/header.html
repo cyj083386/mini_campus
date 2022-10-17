@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	
+	<th:block th:fragment="headerFragment">
+			<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+				<div class="container-fluid">
+					<a class="navbar-brand" href="/">MINI CAMPUS</a>
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					
+					<div class="collapse navbar-collapse" id="navbarColor02">
+						<ul class="navbar-nav me-auto">
+							<li class="nav-item">
+								<a class="nav-link" th:classappend="${#request.getRequestURI().length() == 1 ?'active':''}" href="/">Home</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="/course" th:classappend="${#request.getRequestURI().contains('course')?'active':''}">강좌목록</a>
+							</li>
+						</ul>
+						<div class="d-flex">
+							<ul class="navbar-nav me-auto">
+								<li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+									<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">내 정보</a>
+									<div class="dropdown-menu">
+										<a class="dropdown-item" href="/member/info">내 정보 관리</a>
+										<a class="dropdown-item" href="/member/takecourse">내 수강 목록</a>
+									</div>
+								</li>
+								<li sec:authorize="isAuthenticated()" class="nav-item" >
+									<a class="nav-link" href="/member/logout">로그아웃</a>
+								</li>
+								<li sec:authorize="isAnonymous()" class="nav-item" >
+									<a class="nav-link" href="/member/login">로그인</a>
+								</li>
+								<li sec:authorize="isAnonymous()" class="nav-item" >
+									<a class="nav-link" href="/member/register">회원가입</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</nav>
+	
+	</th:block>
+</html>

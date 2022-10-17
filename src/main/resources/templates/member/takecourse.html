@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/layout}">
+	
+	<head>
+		<title>Mini Campus - 내 강의 목록</title>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		
+		<script>
+			$(document).ready(function () {
+				
+				$('#cancelDiv button').on('click', function () {
+					
+					let status = $(this).val();
+					let id = $(this).closest('#cancelDiv').find('input[name=id]').val();
+					
+					let msg = '수강취소 처리 하시겠습니까?';
+					if (!confirm(msg)) {
+						return false;
+					}
+					
+					
+					let url = '/api/member/course/cancel.api';
+					let parameter = {
+						takeCourseId: id
+					};
+					
+					axios.post(url,parameter)
+						.then(response=>{
+							alert(response.data.message);
+							location.href='/member/takecourse';
+						}).catch(err=>{
+						
+					})
+					
+				});
+			});
+		</script>
+	</head>
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>내 강의 목록</h1>
+		</div>
+		
+		<div class="container-fluid">
+			<table class="table table-hover member-list">
+				<thead>
+					<tr class="table-success">
+						<th scope="col">강의명</th>
+						<th scope="col">신청일</th>
+						<th scope="col">신청 상태</th>
+						<th scope="col">비고</th>
+					</tr>
+				</thead>
+				<tbody id="dataList">
+					<tr th:each="takeCourse : ${list}">
+						<td th:text="${takeCourse.subject}">강의명</td>
+						<td th:text="${takeCourse.registeredAt}">신청일</td>
+						<td th:if="${#strings.equals(takeCourse.status,'COMPLETE')}">결제 완료</td>
+						<td th:if="${#strings.equals(takeCourse.status,'CANCEL')}">수강 취소</td>
+						<td th:if="${#strings.equals(takeCourse.status,'REQUEST')}">수강 신청</td>
+						<td>
+							<div id="cancelDiv" class="status-buttons" th:if="${#strings.equals(takeCourse.status,'REQUEST')}">
+								<input type="hidden" name="id" th:value="${takeCourse.id}"/>
+								<button type="button" value="CANCEL" class="btn btn-outline-danger cancelBtn">수강취소 하기</button>
+							</div>
+						</td>
+					
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		
+		<div class="container-fluid">
+			<ul class="pagination" style="width: 100%; justify-content: center">
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/member/takecourse(page=0)}">&laquo;</a>
+				</li>
+				<li class="page-item" th:classappend="${page.first} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.first} ? '#' : @{/member/takecourse(page=${page.curNum}-1)}">&lt;</a>
+				</li>
+				
+				<li class="page-item" th:each="index : ${#numbers.sequence(page.start,page.end)}"
+				    th:classappend="${index == (page.curNum + 1)} ? 'active'">
+					<a class="page-link" th:text="${index}"
+					   th:href="@{/member/takecourse(page=${index}-1)}">index</a>
+				</li>
+				
+				<li class="page-item" th:classappend="${page.last} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.last} ? '#' : @{/member/takecourse(page=${page.curNum}+1)}">&gt;</a>
+				</li>
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/member/takecourse(page=${page.totalPages}-1)}">&raquo;</a>
+				</li>
+			
+			</ul>
+		</div>
+	</th:block>
+
+
+</html>

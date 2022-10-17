@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/layout}">
+	
+	<head>
+		<title th:text="${course.subject}"></title>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script>
+			
+			$(document).ready(function () {
+				$('.submitBtn').on('click', function () {
+					if (!confirm('수강신청을 하시겠습니까?')) {
+						return false;
+					}
+					
+					let $input = $('#courseId');
+					
+					let url = '/api/course/req.api';
+					let parameter = {
+						courseId: $input.val()
+					};
+					
+					axios.post(url, parameter)
+						.then(response => {
+							if (response.data.result == false) {
+								alert(response.data.message);
+							} else {
+								alert('수강신청 되었습니다.');
+								location.href = '/';
+							}
+							
+						}).catch(err => {
+						alert('수강신청 실패했습니다.');
+						
+					})
+					
+				});
+			});
+		</script>
+	</head>
+	
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<div class="card mb-3">
+				<h3 class="card-header" th:text="${course.subject}">Card header</h3>
+				
+				<div class="card-body" th:utext="${course.contents}">
+				
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item" th:text="'정가 : '+ ${course.price}">정가</li>
+					<li class="list-group-item" th:text="'할인가격 : '+ ${course.salePrice}">할인 가격</li>
+				</ul>
+				<div class="card-body" sec:authorize="isAuthenticated()">
+					<input type="hidden" id="courseId" name="courseId" th:value="${course.id}">
+					<button type="submit" class="btn btn-success submitBtn">수강신청</button>
+				</div>
+			</div>
+		
+		</div>
+	</th:block>
+</html>

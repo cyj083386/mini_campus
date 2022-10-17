@@ -1,0 +1,52 @@
+
+body {
+    font-family: 'SBAggroB';
+    padding-top: 120px;
+    padding-bottom: 120px;
+
+}
+
+.member-list td, .member-list th{
+    border:solid 1px gainsboro;
+}
+
+.memberListSearch{
+
+}
+
+
+@media (min-width: 576px){
+    .container-fluid {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px){
+    .container-fluid {
+        max-width: 720px;
+    }
+}
+@media (min-width: 992px){
+    .container-fluid {
+        max-width: 960px;
+    }
+}
+@media (min-width: 1200px){
+    .container-fluid {
+        max-width: 1140px;
+    }
+}
+@media (min-width: 1400px){
+    .container-fluid {
+        max-width: 1320px;
+    }
+}
+
+
+
+@font-face {
+    font-family: 'SBAggroB';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}

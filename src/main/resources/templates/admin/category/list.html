@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/admin_layout}">
+	
+	<head>
+		<script>
+			$(document).ready(function () {
+				$('button.update-btn').on('click', function () {
+					
+					let $this = $(this);
+					
+					let $tr = $this.closest('tr');
+					
+					$tr.find('input[name=sortValue]').prop("disabled", false);
+					$tr.find('input[name=categoryName]').prop("disabled", false);
+					$tr.find('input[name=usingYn]').prop("disabled", false);
+					$tr.find('button[name=update-btn]').css("display","none")
+					$tr.find('button[name=save-btn]').css("display","")
+				})
+				
+				$('button.delete-btn').on('click', function () {
+					if (!confirm('카테고리를 삭제하시겠습니까?')) {
+						return false;
+					}
+					
+					let $this = $(this);
+					
+					let $tr = $this.closest('tr');
+					
+					let id = $tr.find('input[name=id]').val();
+					
+					$('#deleteForm').find('input[name=id]').attr('value',id);
+					
+					$('#deleteForm').submit();
+				})
+				
+				$('button.save-btn').on('click', function () {
+					if (!confirm('카테고리를 수정하시겠습니까?')) {
+						return false;
+					}
+					
+					let $this = $(this);
+					
+					let $tr = $this.closest('tr');
+					
+					let id = $tr.find('input[name=id]').val();
+					let sortValue = $tr.find('input[name=sortValue]').val();
+					let usingYn = $tr.find('input[name=usingYn]').prop('checked');
+					let categoryName = $tr.find('input[name=categoryName]').val();
+					
+					
+					$('#updateForm').find('input[name=id]').attr('value',id);
+					$('#updateForm').find('input[name=sortValue]').attr('value',sortValue);
+					$('#updateForm').find('input[name=categoryName]').attr('value',categoryName);
+					$('#updateForm').find('input[name=usingYn]').attr('value',usingYn)
+					
+					
+					$('#updateForm').submit();
+				})
+			})
+		</script>
+	</head>
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>카테고리 관리</h1>
+		</div>
+		<div class="container-fluid">
+			<div style="float: left; margin-bottom: 5px;">
+				<form class="d-flex" style="width: 600px" method="post" action="/admin/category/add.do">
+					<div class="form-group">
+						<div class="input-group mb-3">
+							<input type="text" name="categoryName" class="form-control" placeholder="카테고리명 입력">
+							<button class="btn btn-success" type="submit">카테고리 추가</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<table class="table table-hover member-list">
+				<thead>
+					<tr class="table-success">
+						<th scope="col">ID</th>
+						<th scope="col">카테고리명</th>
+						<th scope="col">순서</th>
+						<th scope="col">사용여부</th>
+						<th scope="col">비고</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="categoryDto : ${list}">
+						<td>
+							<span th:text="${categoryDto.id}"></span>
+							<input name="id" type="hidden" th:value="${categoryDto.id}">
+						</td>
+						<td>
+							<input class="form-control" name="categoryName" th:value="${categoryDto.categoryName}"
+							       type="text" disabled>
+						</td>
+						<td>
+							<input class="form-control" name="sortValue" th:value="${categoryDto.sortValue}"
+							       type="text" disabled>
+						</td>
+						<td>
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" name="usingYn" th:checked="${categoryDto.usingYn}" disabled>
+							</div>
+						</td>
+						<td style="text-align: center">
+							<button type="button" name="update-btn" class="btn btn-primary update-btn">수정</button>
+							<button type="button" name="save-btn" class="btn btn-success save-btn" style="display: none">저장</button>
+							<button type="button" name="delete-btn" class="btn btn-danger delete-btn">삭제</button>
+						</td>
+					</tr>
+					
+					<tr th:if="${#lists.size(list) < 1}">
+						<td th:colspan="5" style="text-align: center">
+							내용이 없습니다.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<form id="deleteForm" method="post" action="/admin/category/delete.do">
+				<input type="hidden" name="id">
+			</form>
+			<form id="updateForm" method="post" action="/admin/category/update.do">
+				<input type="hidden" name="id">
+				<input type="hidden" name="categoryName">
+				<input type="hidden" name="sortValue">
+				<input type="hidden" name="usingYn">
+			</form>
+		</div>
+	</th:block>
+
+
+</html>

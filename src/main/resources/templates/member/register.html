@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/layout}">
+	<head>
+		
+		<title>Mini Campus - 회원 가입</title>
+		
+		
+		<style>
+			.field-error {
+				border-color: red;
+			}
+			
+			.field-error-message {
+				color: red;
+			}
+		</style>
+		
+		<script>
+			$(document).ready(function () {
+				
+				$('form').on('submit', function () {
+					let password = $(this).find('input[id=password]').val();
+					let rePassword = $(this).find('input[id=rePassword]').val();
+					
+					if (password != rePassword) {
+						alert('비밀번호가 같지 않습니다. 다시 한번 확인해주세요.');
+						return false;
+					}
+				});
+				
+			});
+		</script>
+	</head>
+	<th:block layout:fragment="content">
+		<form class="container-fluid" th:action th:object="${request}" method="post">
+			
+			<fieldset>
+				<legend>회원가입</legend>
+				<small class="form-text field-error-message" th:text="${errorMessage}">오류메시지</small>
+				
+				<div class="form-group">
+					<label for="email" class="form-label mt-4" th:text="#{label.member.email}">Email address</label>
+					<input type="email" class="form-control" th:field="*{email}" id="email" th:errorclass="field-error"
+					       placeholder="이메일 입력" required/>
+					<small class="form-text field-error-message" th:errors="*{email}">오류메시지</small>
+				</div>
+				
+				<div class="form-group">
+					<label for="password" class="form-label mt-4" th:text="#{label.member.password}">Password</label>
+					<input type="password" class="form-control" th:field="*{password}" id="password"
+					       th:errorclass="field-error" placeholder="비밀번호 입력" required>
+					<small class="form-text field-error-message" th:errors="*{password}">오류메시지</small>
+				</div>
+				
+				<div class="form-group">
+					<label for="rePassword" class="form-label mt-4" th:text="#{label.member.rePassword}">Check
+						Password</label>
+					<input type="password" class="form-control" name="rePassword" id="rePassword" placeholder="비밀번호 확인"
+					       required>
+				</div>
+				
+				<div class="form-group">
+					<label for="name" class="form-label mt-4" th:text="#{label.member.name}">Name</label>
+					<input type="text" class="form-control" th:field="*{name}" id="name" th:errorclass="field-error"
+					       placeholder="이름 입력" required>
+					<small class="form-text field-error-message" th:errors="*{name}">오류메시지</small>
+				</div>
+				
+				<div class="form-group">
+					<label for="phone" class="form-label mt-4" th:text="#{label.member.phone}">Phone</label>
+					<input type="tel" class="form-control" th:field="*{phone}" id="phone" th:errorclass="field-error"
+					       placeholder="휴대전화 번호 입력" required>
+					<small class="form-text field-error-message" th:errors="*{phone}">오류메시지</small>
+				</div>
+				
+				<div class="form-group" style="margin-top: 32px">
+					<button type="submit" class="btn btn-success">회원 가입</button>
+				</div>
+			</fieldset>
+		</form>
+	
+	
+	</th:block>
+</html>

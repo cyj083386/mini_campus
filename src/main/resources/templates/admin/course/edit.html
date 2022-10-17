@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/admin_layout}">
+	
+	<head>
+		<script>
+			$(document).ready(function () {
+				$('form.edit').on('submit', function () {
+					if (!confirm('강의를 수정하시겠습니까?')) {
+						return false;
+					}
+					oEditors.getById["contents"].exec("UPDATE_CONTENTS_FIELD", []);
+				})
+				
+			})
+		</script>
+	</head>
+	
+	
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>강의 등록</h1>
+		</div>
+		<div class="container-fluid">
+			<form class="edit" method="post">
+				<fieldset>
+					<input type="hidden" th:value="${course.id}" name="id">
+					<div class="form-group">
+						<label for="category" class="form-label mt-4">카테고리</label>
+						<select class="form-select" id="category" name="categoryId">
+							<option th:each="category :${categories}" th:text="${category.categoryName}"
+							        th:value="${category.id}"
+							        th:selected="${#strings.equals(course.categoryName,category.categoryName)}">
+								카테고리명
+							</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="subject" class="form-label mt-4">강의명</label>
+						<input type="text" class="form-control" name="subject" id="subject" placeholder="강의명 입력"
+						       th:value="${course.subject}"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="keyword" class="form-label mt-4">키워드</label>
+						<input type="text" class="form-control" name="keyword" id="keyword" placeholder="키워드 입력"
+						       th:value="${course.keyword}"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="summary" class="form-label mt-4">요약 문구</label>
+						<textarea class="form-control" id="summary" name="summary" rows="3" placeholder="요약문구 입력"
+						          th:text="${course.summary}"
+						          required></textarea>
+					</div>
+					<div class="form-group">
+						<label for="contents" class="form-label mt-4">내용</label>
+						<textarea id="contents" name="contents" rows="20" style="width: 100%" th:text="${course.contents}"></textarea>
+					</div>
+					
+					<div class="form-group">
+						<label for="price" class="form-label mt-4">정가</label>
+						<input type="number" class="form-control" name="price" id="price" placeholder="정가 입력"
+						       th:value="${course.price}"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="salePrice" class="form-label mt-4">판매가</label>
+						<input type="number" class="form-control" name="salePrice" id="salePrice" placeholder="판매가 입력"
+						       th:value="${course.salePrice}"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="saleEndAt" class="form-label mt-4">할인 종료일</label>
+						<input type="datetime-local" class="form-control" name="saleEndAt" id="saleEndAt"
+						       placeholder="할인 종료일 입력"
+						       th:value="${course.saleEndAt}"
+						       required>
+					</div>
+					
+					
+					
+				</fieldset>
+				
+				<div style="text-align: center;margin-top: 10px">
+					<button type="submit" class="btn btn-primary edit-btn" >수정하기</button>
+				</div>
+			</form>
+		</div>
+		<script type="text/javascript" src="/res/se2/js/service/HuskyEZCreator.js" charset="utf-8"></script>
+		<script type="text/javascript">
+			var oEditors = [];
+			nhn.husky.EZCreator.createInIFrame({
+				oAppRef: oEditors,
+				elPlaceHolder: "contents",
+				sSkinURI: "/res/se2/SmartEditor2Skin.html",
+				fCreator: "createSEditor2",
+			});
+		</script>
+	</th:block>
+
+
+</html>

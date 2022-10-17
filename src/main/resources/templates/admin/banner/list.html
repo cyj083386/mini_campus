@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/admin_layout}">
+	
+	
+	<head>
+		<script>
+			$(document).ready(function () {
+				$('#delete-btn').on('click', function () {
+					if (!confirm('삭제하시겠습니까?')) {
+						return false;
+					}
+					
+					let $checked = $('#dataList input[type=checkbox]:checked');
+					
+					if ($checked.length < 1) {
+						alert('삭제할 강의를 선택해주세요');
+					}
+					
+					let idList = [];
+					
+					$.each($checked, function (k, v) {
+						idList.push($(this).val());
+					});
+					
+					
+					let $deleteForm = $('form[name=deleteForm]');
+					$deleteForm.find('input[name=idList]').val(idList.join(','));
+					$deleteForm.submit();
+				})
+				
+				$('#selectAll').on('click', function () {
+					let checked = $(this).is(':checked');
+					
+					$('#dataList input[type=checkbox]').each(function (k, v) {
+						$(this).prop('checked', checked);
+					});
+					
+				});
+				
+			});
+		</script>
+	</head>
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>배너 관리</h1>
+		</div>
+		<div class="container-fluid">
+			<div style="float: right; margin-bottom: 5px">
+				<button type="button" class="btn btn-primary"
+				        th:onclick="|location.href='@{/admin/banner/list.do}'|">전체
+				</button>
+				<button type="button" class="btn btn-warning"
+				        th:onclick="|location.href='@{/admin/banner/list.do?searchType=openYn&searchValue=true}'|">사용중
+				</button>
+				<button type="button" class="btn btn-success"
+				        th:onclick="|location.href='@{/admin/banner/list.do?searchType=openYn&searchValue=false}'|">미사용중
+				</button>
+			</div>
+		</div>
+		<div class="container-fluid">
+			
+			<button type="button" class="btn btn-primary"
+			        th:onclick="|location.href='@{/admin/banner/add.do}'|">
+				배너 등록
+			</button>
+			
+			<button type="button" class="btn btn-danger" id="delete-btn" style="margin-left: 10px;">선택 삭제</button>
+		</div>
+		
+		
+		<div class="container-fluid">
+			<table class="table table-hover member-list">
+				<thead>
+					<tr class="table-success">
+						<th><input type="checkbox" id="selectAll"></th>
+						<th scope="col">번호</th>
+						<th scope="col">배너명</th>
+						<th scope="col">이미지</th>
+						<th scope="col">등록일</th>
+					</tr>
+				</thead>
+				<tbody id="dataList">
+					<tr th:each="banner : ${list}">
+						<th style="width: 5%;"><input type="checkbox" th:value="${banner.id}"></th>
+						<th style="width: 5%;" scope="row" th:text="${bannerStat.count+ 10 * page.curNum}">번호</th>
+						<td style="width: 20%;">
+							<a th:text="${banner.name}" th:href="@{/admin/banner/edit.do(id=${banner.id})}">배너명</a>
+						</td>
+						<td style="width: 50%;"><img th:src="${banner.imgUrl}" style="width: 100%" height="300px"></td>
+						<td style="width: 20%;" th:text="${banner.registeredAt}">등록일</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="container-fluid">
+			<ul class="pagination" style="width: 100%; justify-content: center">
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/admin/banner/list.do(page=0 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&laquo;</a>
+				</li>
+				<li class="page-item" th:classappend="${page.first} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.first} ? '#' : @{/admin/banner/list.do(page=${page.curNum}-1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&lt;</a>
+				</li>
+				
+				<li class="page-item" th:each="index : ${#numbers.sequence(page.start,page.end)}"
+				    th:classappend="${index == (page.curNum + 1)} ? 'active'">
+					<a class="page-link" th:text="${index}"
+					   th:href="@{/admin/banner/list.do(page=${index}-1
+						,searchType=${searchInput.searchType}
+						,searchValue=${searchInput.searchValue})}">index</a>
+				</li>
+				
+				<li class="page-item" th:classappend="${page.last} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.last} ? '#' : @{/admin/banner/list.do(page=${page.curNum}+1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&gt;</a>
+				</li>
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/admin/banner/list.do(page=${page.totalPages}-1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&raquo;</a>
+				</li>
+			
+			</ul>
+		</div>
+		
+		<div class="container-fluid">
+			<div style="margin-top: 5px;display: flex;justify-content: center">
+				<form class="d-flex" style="width: 600px">
+					<select class="form-select" name="searchType" style="width: 40%;">
+						<option th:selected="${#strings.equals(searchInput.searchType,'name')}"
+						        value="name">
+							배너명
+						</option>
+					</select>
+					
+					
+					<input class="form-control me-sm-2" type="search" th:value="${searchInput.searchValue}"
+					       name="searchValue" placeholder="Search">
+					<button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 90px;">검색</button>
+				
+				</form>
+			</div>
+		</div>
+		
+		<form name="deleteForm" method="post" action="/admin/banner/delete.do">
+			<input type="hidden" name="idList"/>
+		</form>
+	</th:block>
+
+
+</html>

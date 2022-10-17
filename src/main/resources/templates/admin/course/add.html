@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/admin_layout}">
+	<head>
+		<script>
+			$(document).ready(function () {
+				$('#submitForm').on('submit', function () {
+					oEditors.getById["contents"].exec("UPDATE_CONTENTS_FIELD", []);
+				});
+			});
+		</script>
+		<script type="text/javascript" src="/res/ckeditor/ckeditor.js"></script>
+	</head>
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>강의 등록</h1>
+		</div>
+		<div class="container-fluid">
+			<form method="post" id="submitForm" enctype="multipart/form-data">
+				<fieldset>
+					<div class="form-group">
+						<label for="category" class="form-label mt-4">카테고리</label>
+						<select class="form-select" id="category" name="categoryId">
+							<option th:each=" category :${categories}" th:text="${category.categoryName}"
+							        th:value="${category.id}">
+								카테고리명
+							</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="subject" class="form-label mt-4">강의명</label>
+						<input type="text" class="form-control" name="subject" id="subject" placeholder="강의명 입력"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="keyword" class="form-label mt-4">키워드</label>
+						<input type="text" class="form-control" name="keyword" id="keyword" placeholder="키워드 입력"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="summary" class="form-label mt-4">요약 문구</label>
+						<textarea class="form-control" id="summary" name="summary" rows="3" placeholder="요약문구 입력"
+						          required></textarea>
+					</div>
+					<div class="form-group">
+						<label for="contents" class="form-label mt-4">내용</label>
+						<textarea name="contents" class="form-control" id="contents" rows="6"></textarea>
+					
+					</div>
+					
+					<div class="form-group">
+						<label for="price" class="form-label mt-4">정가</label>
+						<input type="text" class="form-control" name="price" id="price" placeholder="정가 입력"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="salePrice" class="form-label mt-4">판매가</label>
+						<input type="text" class="form-control" name="salePrice" id="salePrice" placeholder="판매가 입력"
+						       required>
+					</div>
+					<div class="form-group">
+						<label for="saleEndAt" class="form-label mt-4">할인 종료일</label>
+						<input type="datetime-local" class="form-control" name="saleEndAt" id="saleEndAt"
+						       placeholder="할인 종료일 입력"
+						       required>
+					</div>
+				</fieldset>
+				
+				<div style="text-align: center;margin-top: 10px">
+					<button type="submit" class="btn btn-primary">등록하기</button>
+				</div>
+			</form>
+		</div>
+		
+		<script>
+			let ckeditor_config = {
+				width: '100%',
+				height: '400px',
+				filebrowserUploadUrl: "/imageupload",
+			};
+			
+			CKEDITOR.replace("contents", ckeditor_config);
+		</script>
+	</th:block>
+
+
+</html>

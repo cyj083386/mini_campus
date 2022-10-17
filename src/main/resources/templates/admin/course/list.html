@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{commons/admin_layout}">
+	
+	
+	<head>
+		<script>
+			$(document).ready(function () {
+				$('#delete-btn').on('click',function (){
+					if (!confirm('삭제하시겠습니까?')) {
+						return false;
+					}
+					
+					let $checked = $('#dataList input[type=checkbox]:checked');
+					
+					if ($checked.length < 1) {
+						alert('삭제할 강의를 선택해주세요');
+					}
+					
+					let idList = [];
+					
+					$.each($checked, function (k, v) {
+						idList.push($(this).val());
+					});
+					
+					
+					let $deleteForm = $('form[name=deleteForm]');
+					$deleteForm.find('input[name=idList]').val(idList.join(','));
+					$deleteForm.submit();
+				})
+				
+				$('#selectAll').on('click',function (){
+					let checked = $(this).is(':checked');
+					
+					$('#dataList input[type=checkbox]').each(function (k, v) {
+						$(this).prop('checked', checked);
+					});
+					
+				});
+				
+			});
+		</script>
+	</head>
+	
+	<th:block layout:fragment="content">
+		<div class="container-fluid">
+			<h1>강의 관리</h1>
+		</div>
+		
+		<div class="container-fluid">
+			<a href="/admin/course/add.do" style="text-decoration: none">
+				<button type="button" class="btn btn-primary">강의 등록</button>
+			</a>
+			
+			
+			<button type="button" class="btn btn-danger" id="delete-btn" style="margin-left: 10px;">선택 삭제</button>
+			
+			
+			<div style="float: right; margin-bottom: 5px">
+				<form class="d-flex" style="width: 600px">
+					<select class="form-select" name="searchType" style="width: 40%;">
+						<option th:selected="${#strings.equals(searchInput.searchType,'subject')}" value="subject">
+							강의명
+						</option>
+						<option th:selected="${#strings.equals(searchInput.searchType,'categoryName')}"
+						        value="categoryName">
+							카테고리명
+						</option>
+					</select>
+					
+					
+					<input class="form-control me-sm-2" type="search" th:value="${searchInput.searchValue}"
+					       name="searchValue" placeholder="Search">
+					<button class="btn btn-secondary my-2 my-sm-0" type="submit" style="width: 90px;">검색</button>
+				
+				</form>
+			</div>
+		</div>
+		
+		
+		<div class="container-fluid">
+			<table class="table table-hover member-list">
+				<thead>
+					<tr class="table-success">
+						<th><input type="checkbox" id="selectAll"></th>
+						<th scope="col">ID</th>
+						<th scope="col">강의명</th>
+						<th scope="col">카테고리명</th>
+						<th scope="col">등록일</th>
+					</tr>
+				</thead>
+				<tbody id="dataList">
+					<tr th:each="course : ${list}">
+						<th><input type="checkbox" th:value="${course.id}"></th>
+						<td th:text="${course.id}">ID</td>
+						<td>
+							<a th:text="${course.subject}" th:href="@{/admin/course/edit.do(id=${course.id})}">강의명</a>
+						</td>
+						<td th:text="${course.categoryName}">카테고리</td>
+						<td th:text="${course.registeredAt}">등록일</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="container-fluid">
+			<ul class="pagination" style="width: 100%; justify-content: center">
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/admin/course/list.do(page=0 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&laquo;</a>
+				</li>
+				<li class="page-item" th:classappend="${page.first} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.first} ? '#' : @{/admin/course/list.do(page=${page.curNum}-1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&lt;</a>
+				</li>
+				
+				<li class="page-item" th:each="index : ${#numbers.sequence(page.start,page.end)}"
+				    th:classappend="${index == (page.curNum + 1)} ? 'active'">
+					<a class="page-link" th:text="${index}"
+					   th:href="@{/admin/course/list.do(page=${index}-1
+						,searchType=${searchInput.searchType}
+						,searchValue=${searchInput.searchValue})}">index</a>
+				</li>
+				
+				<li class="page-item" th:classappend="${page.last} ? 'disabled'">
+					<a class="page-link"
+					   th:href="${page.last} ? '#' : @{/admin/course/list.do(page=${page.curNum}+1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&gt;</a>
+				</li>
+				<li class="page-item">
+					<a class="page-link"
+					   th:href="@{/admin/course/list.do(page=${page.totalPages}-1 ,searchType=${searchInput.searchType},searchVaue=${searchInput.searchValue})}">&raquo;</a>
+				</li>
+			
+			</ul>
+		</div>
+		
+		<form name="deleteForm" method="post" action="/admin/course/delete.do">
+			<input type="hidden" name="idList"/>
+		</form>
+	</th:block>
+
+	
+
+</html>
